@@ -1,12 +1,8 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { format } from "date-fns";
 
-const daysOfWeek = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+const daysOfWeek = ["NIEDZIELA", "PONIEDZIAŁEK", "WTOREK", "ŚRODA", "CZWARTEK", "PIĄTEK", "SOBOTA"];
 
 const printTypes = [
   "CZARNY", "KOLOROWY", "LASER", "LASER/CZARNY", "Czarny/kolorowy", "Biały", "CZARNY/BIAŁY",
@@ -18,12 +14,7 @@ const carriers = [
 ];
 
 const statuses = ["ZROBIONE", "OCZEKUJE", "ANULOWANE"];
-
-const modes = [
-  { value: "P", color: "bg-red-500" },
-  { value: "L", color: "bg-green-500" },
-  { value: "E", color: "bg-blue-500" },
-];
+const modes = ["P", "L", "E"];
 
 export default function OrderApp() {
   const [orders, setOrders] = useState([]);
@@ -68,82 +59,63 @@ export default function OrderApp() {
   }, {});
 
   return (
-    <div className="p-4 space-y-4">
-      <Card>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4">
-          <Input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-          />
-          <Input
-            placeholder="NUMER ZAMÓWIENIA / NICK Z ALLEGRO"
-            value={form.nick}
-            onChange={(e) => setForm({ ...form, nick: e.target.value.toUpperCase() })}
-          />
-          <Input
-            placeholder="ILOŚĆ"
-            value={form.amount}
-            onChange={(e) => setForm({ ...form, amount: e.target.value.toUpperCase() })}
-          />
-          <Select value={form.mode} onValueChange={(value) => setForm({ ...form, mode: value })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {modes.map((m) => (
-                <SelectItem key={m.value} value={m.value} className={`${m.color} text-white`}>{m.value}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={form.printType} onValueChange={(value) => setForm({ ...form, printType: value })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {printTypes.map((type) => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={form.carrier} onValueChange={(value) => setForm({ ...form, carrier: value })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {carriers.map((carrier) => (
-                <SelectItem key={carrier} value={carrier}>{carrier}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={form.status} onValueChange={(value) => setForm({ ...form, status: value })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {statuses.map((status) => (
-                <SelectItem key={status} value={status}>{status}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            placeholder="UWAGI"
-            value={form.note}
-            onChange={(e) => setForm({ ...form, note: e.target.value.toUpperCase() })}
-          />
-          <Button onClick={addOrder}>DODAJ</Button>
-        </CardContent>
-      </Card>
+    <div style={{ padding: 20, fontFamily: "Arial, sans-serif" }}>
+      <div style={{ marginBottom: 20 }}>
+        <h2>DODAJ ZLECENIE</h2>
+        <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+        <input placeholder="NUMER ZAMÓWIENIA / NICK Z ALLEGRO" value={form.nick} onChange={e => setForm({ ...form, nick: e.target.value.toUpperCase() })} />
+        <input placeholder="ILOŚĆ" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value.toUpperCase() })} />
+        <select value={form.mode} onChange={e => setForm({ ...form, mode: e.target.value })}>
+          {modes.map(mode => <option key={mode} value={mode}>{mode}</option>)}
+        </select>
+        <select value={form.printType} onChange={e => setForm({ ...form, printType: e.target.value })}>
+          {printTypes.map(type => <option key={type} value={type}>{type}</option>)}
+        </select>
+        <select value={form.carrier} onChange={e => setForm({ ...form, carrier: e.target.value })}>
+          {carriers.map(carrier => <option key={carrier} value={carrier}>{carrier}</option>)}
+        </select>
+        <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
+          {statuses.map(status => <option key={status} value={status}>{status}</option>)}
+        </select>
+        <input placeholder="UWAGI" value={form.note} onChange={e => setForm({ ...form, note: e.target.value.toUpperCase() })} />
+        <button onClick={addOrder}>DODAJ</button>
+      </div>
 
       {Object.entries(groupedOrders).sort().map(([day, orders], i) => (
-        <div key={i} className="border rounded-xl p-4 shadow-md">
-          <h2 className="text-xl font-bold mb-4">{day}</h2>
-          {orders.map((order, idx) => (
-            <div key={idx} className="grid grid-cols-9 gap-2 items-center border-b py-2">
-              <span>{idx + 1}</span>
-              <span>{format(new Date(order.date), 'dd.MM.yyyy')}</span>
-              <span>{order.nick}</span>
-              <span>{order.amount}</span>
-              <span>{order.mode}</span>
-              <span>{order.printType}</span>
-              <span>{order.carrier}</span>
-              <span>{order.status}</span>
-              <span>{order.note}</span>
-              <Button variant="destructive" size="sm" onClick={() => deleteOrder(idx)}>Usuń</Button>
-            </div>
-          ))}
+        <div key={i} style={{ border: "1px solid #ccc", marginBottom: 20, padding: 10 }}>
+          <h3>{day}</h3>
+          <table border="1" cellPadding="5" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th>LP</th>
+                <th>DATA</th>
+                <th>NUMER / NICK</th>
+                <th>ILOŚĆ</th>
+                <th>TRYB</th>
+                <th>NADRUK</th>
+                <th>PRZEWOŹNIK</th>
+                <th>STATUS</th>
+                <th>UWAGI</th>
+                <th>AKCJE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{format(new Date(order.date), 'dd.MM.yyyy')}</td>
+                  <td>{order.nick}</td>
+                  <td>{order.amount}</td>
+                  <td>{order.mode}</td>
+                  <td>{order.printType}</td>
+                  <td>{order.carrier}</td>
+                  <td>{order.status}</td>
+                  <td>{order.note}</td>
+                  <td><button onClick={() => deleteOrder(idx)}>Usuń</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ))}
     </div>
